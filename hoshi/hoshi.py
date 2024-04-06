@@ -264,7 +264,7 @@ class Hoshi:
         listing_level: int = 1
         listing_itemize: str = "-"
         ljust_description_len: int = 0
-        ljust_description_filler: str = "-"
+        ljust_description_filler: str = "."
         ljust_value_len: int = 40
         ljust_value_filler: str = "."
         ljust_value_max_len: int = 40
@@ -403,6 +403,40 @@ class Hoshi:
 
         return item_input
 
+    def _item_raw_handler(
+        self,
+        item_raw: Union[tuple[Any, ...], dict[str, Any]],
+    ) -> dict[str, Any]:
+        item = {}
+        if isinstance(item_raw, dict):
+            item = item_raw
+        elif isinstance(item_raw, (tuple, list)):
+            item["type"] = item_raw[0]
+            if item["type"] == "itemize":
+                item["description"] = str(item_raw[1])
+                item["value"] = item_raw[2] if len(item_raw) > 2 else None
+                item["hint"] = item_raw[3] if len(item_raw) > 3 else None
+                item["listing_level"] = (
+                    item_raw[4] if len(item_raw) > 4 else self._config.listing_level
+                )
+            elif item["type"] == "txt":
+                item["text"] = item_raw[1]
+                item["listing_level"] = (
+                    item_raw[2] if len(item_raw) > 2 else self._config.listing_level
+                )
+            elif item["type"] == "divider":
+                item["length"] = (
+                    item_raw[1] if len(item_raw) > 1 else self._config.divider_length
+                )
+            elif item["type"] in ["h1", "h2", "h3", "h4", "h5", "h6"]:
+                item["title"] = item_raw[1]
+                item["heading"] = int(item["type"].replace("h", ""))
+            else:
+                raise ValueError(f"Unknown print type, '{item['type']}'.")
+        else:
+            raise TypeError(f"Unknown item type. '{item}', '{type(item)}'.")
+        return item
+
     def _update(self):
         """Update the print lines."""
 
@@ -410,51 +444,7 @@ class Hoshi:
         _formated = []
 
         for item_raw in self._raw:
-            item = {}
-            if isinstance(item_raw, dict):
-                item = item_raw
-            elif isinstance(item_raw, (tuple, list)):
-                item["type"] = item_raw[0]
-                if item["type"] == "itemize":
-                    item["description"] = str(item_raw[1])
-                    item["value"] = item_raw[2] if len(item_raw) > 2 else None
-                    item["hint"] = item_raw[3] if len(item_raw) > 3 else None
-                    item["listing_level"] = (
-                        item_raw[4] if len(item_raw) > 4 else self._config.listing_level
-                    )
-                elif item["type"] == "txt":
-                    item["text"] = item_raw[1]
-                    item["listing_level"] = (
-                        item_raw[2] if len(item_raw) > 2 else self._config.listing_level
-                    )
-                elif item["type"] == "divider":
-                    item["length"] = (
-                        item_raw[1]
-                        if len(item_raw) > 1
-                        else self._config.divider_length
-                    )
-                elif item["type"] == "h1":
-                    item["title"] = item_raw[1]
-                    item["heading"] = 1
-                elif item["type"] == "h2":
-                    item["title"] = item_raw[1]
-                    item["heading"] = 2
-                elif item["type"] == "h3":
-                    item["title"] = item_raw[1]
-                    item["heading"] = 3
-                elif item["type"] == "h4":
-                    item["title"] = item_raw[1]
-                    item["heading"] = 4
-                elif item["type"] == "h5":
-                    item["title"] = item_raw[1]
-                    item["heading"] = 5
-                elif item["type"] == "h6":
-                    item["title"] = item_raw[1]
-                    item["heading"] = 6
-                else:
-                    raise ValueError(f"Unknown print type, '{item['type']}'.")
-            else:
-                raise TypeError(f"Unknown item type. '{item}', '{type(item)}'.")
+            item = self._item_raw_handler(item_raw)
 
             content = ""
             item_input = {k: v for k, v in item.items() if k != "type"}
