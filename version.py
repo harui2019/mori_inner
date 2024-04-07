@@ -5,7 +5,7 @@ CapSule Version (:mod:`qurry.capsule.version`)
 ================================================================
 """
 
-version_main = (0, 6, 2)
+version_main = (0, 7, 0)
 """The main version of CapSule."""
 
 
