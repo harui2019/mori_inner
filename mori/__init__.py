@@ -1,6 +1,7 @@
 """
 ================================================================
-Mori
+Mori 💀 (:mod:`qurry.capsule.mori`)
+================================================================
 
 ## Why Mori?
 
@@ -11,8 +12,6 @@ Mori
     Definitely NOT because I'm a DeadBeat, 
     the fan of Hololive VTuber Mori Calliope, 
     and I didn't want to name something after her for a not short time.
-
-================================================================
 
 """
 
