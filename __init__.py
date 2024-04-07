@@ -35,9 +35,11 @@ CapSule - Qurry Data Structure Complex
 """
 
 import webbrowser
+from random import random
 
 from .jsonablize import parse as jsonablize, quickJSONExport, sort_hashable_ahead
 from .quick import quickJSON, quickListCSV, quickRead
+from .hoshi import repr_modifier as _repr_modifier
 
 # pylint: disable=invalid-name
 
@@ -77,6 +79,7 @@ def dead_beats_lurking_now():
     print("This function makes no sense.")
 
 
+@_repr_modifier("<INTERNET_YAMERO>")
 def internet_is_fxxking_awesome():
     """Internet is Fxxking Awesome!
 
@@ -85,13 +88,31 @@ def internet_is_fxxking_awesome():
     Yearn for your material touch
     Swim in cyber euphoria internet boy
     """
-    webbrowser.open("https://www.youtube.com/watch?v=Lp5n-YS22tY")
-    print("Internet is Fxxking Awesome!")
-    print()
-    print("Rushing through me is Ecstasy")
-    print("Lovely dreams brought through heavenly Myslee")
-    print("Yearn for your material touch")
-    print("Swim in cyber euphoria internet boy")
+    if random() <= 0.2:
+        webbrowser.open("https://www.youtube.com/watch?v=51GIxXFKbzk")
+        print("Intaanetto saikou!!!")
+        print()
+        print("hotobashiru ekusutashii")
+        print("amai yume o misete maisurii")
+        print("yubisaki de kanjiru oyogu")
+        print("denshi no umi intanetto booi")
+
+    else:
+        webbrowser.open("https://www.youtube.com/watch?v=Lp5n-YS22tY")
+        print("Internet is Fxxking Awesome!!!")
+        print()
+        print("Rushing through me is Ecstasy")
+        print("Lovely dreams brought through heavenly Myslee")
+        print("Yearn for your material touch")
+        print("Swim in cyber euphoria internet boy")
+
+
+def your_need_earbuds_then_call_this_function():
+    """I have warned you. You need earbuds to call this function."""
+    if random() <= 0.2:
+        webbrowser.open("https://www.nicovideo.jp/watch/sm19233263")
+    else:
+        webbrowser.open("https://www.youtube.com/watch?v=4w3zoAbxkbo")
 
 
 # pylint=enable=invalid-name
