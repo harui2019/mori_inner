@@ -25,7 +25,7 @@ class BasicHookArgumentsRaw(TypedDict):
     save_location: Union[Path, str]
 
 class BasicHook:
-    """BasicHook is the basic webhook for Capsule.
+    """BasicHook is the basic webhook for CapSule.
 
     Args:
         url (str):
