@@ -264,7 +264,7 @@ class Hoshi:
         listing_level: int = 1
         listing_itemize: str = "-"
         ljust_description_len: int = 0
-        ljust_description_filler: str = "."
+        ljust_description_filler: str = "-"
         ljust_value_len: int = 40
         ljust_value_filler: str = "."
         ljust_value_max_len: int = 40
