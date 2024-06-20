@@ -89,7 +89,7 @@ def sort_hashable_ahead(o: dict) -> dict:
             sort_o[k] = v
 
     for k, v in o.items():
-        if not k in sort_o:
+        if k not in sort_o:
             sort_o[k] = v
 
     return sort_o

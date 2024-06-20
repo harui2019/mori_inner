@@ -2,7 +2,7 @@
 # Hoshi - A process content printer ?
 
 - Before:
-        
+
 >>> print(" ### Qiskit version outdated warning")
 >>> print("Please keep mind on your qiskit version, 
 an very outdated version may cause some problems.")
@@ -14,9 +14,9 @@ Please keep mind on your qiskit version, an very outdated version may cause some
 - Local Qiskit version ---------------- 0.39.0
 - Latest Qiskit version --------------- 0.39.0
 ```
-        
+
 - After:
-        
+
 >>> check_msg = Hoshi(
         [
             ("divider", 60),
@@ -38,7 +38,7 @@ Please keep mind on your qiskit version, an very outdated version may cause some
 >>> print(check_msg)
 
 ```
-        
+
 ------------------------------------------------------------
  ### Qiskit version outdated warning
  Please keep mind on your qiskit version, an very outdated version may cause some problems.
@@ -106,9 +106,7 @@ def divider(length: int = 60, raw_input=False) -> Union[str, dict[str, Any]]:
     return content
 
 
-def txt(
-    text: str, listing_level: int = 1, raw_input=False
-) -> Union[str, dict[str, Any]]:
+def txt(text: str, listing_level: int = 1, raw_input=False) -> Union[str, dict[str, Any]]:
     """Print a text.
 
     Args:
@@ -162,7 +160,8 @@ def itemize(
     description: str,
     *,
     export_len: Literal[True],
-) -> tuple[str, int, int]: ...
+) -> tuple[str, int, int]:
+    ...
 
 
 @overload
@@ -170,7 +169,8 @@ def itemize(
     description: str,
     *,
     independent_newline: Literal[True],
-) -> Union[tuple[str, str], str]: ...
+) -> Union[tuple[str, str], str]:
+    ...
 
 
 @overload
@@ -179,7 +179,8 @@ def itemize(
     *,
     export_len: bool,
     independent_newline: bool,
-) -> str: ...
+) -> str:
+    ...
 
 
 def itemize(
@@ -203,12 +204,8 @@ def itemize(
 
     content = ""
     brokelinehint = ""
-    if not value is None:
-        value = (
-            pprint.pformat(value)
-            if isinstance(value, (list, tuple, dict))
-            else str(value)
-        )
+    if value is not None:
+        value = pprint.pformat(value) if isinstance(value, (list, tuple, dict)) else str(value)
 
         if len(value) > max_value_len:
             value = value[:max_value_len] + "..."
@@ -222,9 +219,9 @@ def itemize(
     else:
         content += " " * (2 * listing_level - 1) + f"{listing_itemize} {description}"
 
-    if (not hint is None) and (hint != ""):
+    if (hint is not None) and (hint != ""):
         hint = str(hint)
-        if not value is None:
+        if value is not None:
             value_str, ljust_value_len = _ljust_filling(
                 previous=value, length=ljust_value_len, filler=ljust_value_filler
             )
@@ -239,7 +236,7 @@ def itemize(
         else:
             content += value_str + " " + hint_itemize + " " + hint
     else:
-        if not value is None:
+        if value is not None:
             content += str(value)
 
     if export_len:
@@ -394,9 +391,7 @@ class Hoshi:
 
         if item_type == "itemize":
             for k in self._config.itemize_fields:
-                item_input[k] = (
-                    getattr(self._config, k) if k not in item_input else item_input[k]
-                )
+                item_input[k] = getattr(self._config, k) if k not in item_input else item_input[k]
             if mode == "config":
                 item_input["ljust_description_len"] = 0
                 item_input["ljust_value_len"] = 0
@@ -425,9 +420,7 @@ class Hoshi:
                     item_raw[2] if len(item_raw) > 2 else self._config.listing_level
                 )
             elif item["type"] == "divider":
-                item["length"] = (
-                    item_raw[1] if len(item_raw) > 1 else self._config.divider_length
-                )
+                item["length"] = item_raw[1] if len(item_raw) > 1 else self._config.divider_length
             elif item["type"] in ["h1", "h2", "h3", "h4", "h5", "h6"]:
                 item["title"] = item_raw[1]
                 item["heading"] = int(item["type"].replace("h", ""))
@@ -450,9 +443,7 @@ class Hoshi:
             item_input = {k: v for k, v in item.items() if k != "type"}
             # config
             if item["type"] == "itemize":
-                item_input = self._item_input_handler(
-                    "itemize", item_input, mode="config"
-                )
+                item_input = self._item_input_handler("itemize", item_input, mode="config")
                 (content, ljust_description_len, ljust_value_len) = itemize(
                     **item_input, export_len=True
                 )
@@ -461,9 +452,7 @@ class Hoshi:
                         ljust_description_len=ljust_description_len
                     )
                 if ljust_value_len > self._config.ljust_value_len:
-                    self._config = self._config._replace(
-                        ljust_value_len=ljust_value_len
-                    )
+                    self._config = self._config._replace(ljust_value_len=ljust_value_len)
 
             _formated.append(item)
 

@@ -69,11 +69,13 @@ def tuple_str_parse(k: str) -> Union[tuple[str, ...], str]:
 @overload
 def key_tuple_loads(
     o: dict[Union[Hashable, _K], _T]
-) -> dict[Union[Hashable, tuple[Hashable, ...], _K], _T]: ...
+) -> dict[Union[Hashable, tuple[Hashable, ...], _K], _T]:
+    ...
 
 
 @overload
-def key_tuple_loads(o: _T) -> _T: ...
+def key_tuple_loads(o: _T) -> _T:
+    ...
 
 
 def key_tuple_loads(o):
@@ -135,7 +137,6 @@ class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
         name: str = __name__,
         tuple_str_auto_transplie: bool = True,
     ) -> None:
-
         if o is None:
             o = {}
         if not isinstance(o, dict):
@@ -263,9 +264,7 @@ class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
         if json_dump_args is None:
             json_dump_args = defaultJsonDumpArgs.copy()
         else:
-            json_dump_args = {
-                k: v for k, v in json_dump_args.items() if k != "obj" or k != "fp"
-            }
+            json_dump_args = {k: v for k, v in json_dump_args.items() if k != "obj" or k != "fp"}
             json_dump_args = {**defaultJsonDumpArgs.copy(), **json_dump_args}
 
         # save_location
@@ -279,9 +278,7 @@ class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
 
         # file type check
         if filetype not in cls.availableFile:
-            raise ValueError(
-                f"Instead of '{filetype}', Only {cls.availableFile} can be exported."
-            )
+            raise ValueError(f"Instead of '{filetype}', Only {cls.availableFile} can be exported.")
 
         # return {
         #     "open_args": open_args,
@@ -477,7 +474,7 @@ class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
                 )
             return cls(name=taglist_name)
         ls_loc2 = [f for f in ls_loc1 if filetype in f]
-        if not name is None:
+        if name is not None:
             ls_loc2 = [f for f in ls_loc2 if name in f]
 
         if len(ls_loc2) < 1:
@@ -525,6 +522,4 @@ class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
                     obj[kt].append(v)
             return obj
 
-        raise ValueError(
-            f"Instead of '{filetype}', Only {cls.availableFile} can be exported."
-        )
+        raise ValueError(f"Instead of '{filetype}', Only {cls.availableFile} can be exported.")

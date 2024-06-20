@@ -24,7 +24,7 @@ CapSule - Qurry Data Structure Complex
     That's meaning that Github Copilot knows VTuber, Hololive, even Suisei, 
     who trains it with such content and how. 
     "Does Skynet subscribe to Virtual Youtuber?")
-    
+
 - CapSule
     It's also not possible I named this for there is a song 
     called [CapSule](https://youtu.be/M85xU-tbQ6c?si=Ysk7pJu1eKIMOCBv)

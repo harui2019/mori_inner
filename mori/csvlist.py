@@ -218,18 +218,14 @@ class SingleColumnCSV(list[_T]):
         ls_loc1 = glob.glob(str(args.save_location / f"*{name}.*"))
         if len(ls_loc1) == 0:
             if raise_not_found_error:
-                raise FileNotFoundError(
-                    f"The file '*{name}.*' not found at '{save_location}'."
-                )
+                raise FileNotFoundError(f"The file '*{name}.*' not found at '{save_location}'.")
             return cls(name=name)
 
         ls_loc2 = list(ls_loc1) if name is None else [f for f in ls_loc1 if name in f]
 
         if len(ls_loc2) < 1:
             if raise_not_found_error:
-                raise FileNotFoundError(
-                    f"The file '{name}.csv' not found at '{save_location}'."
-                )
+                raise FileNotFoundError(f"The file '{name}.csv' not found at '{save_location}'.")
             return cls(name=name)
         if len(ls_loc2) > 1:
             ls_loc2 = [ls_loc2[which_num]]

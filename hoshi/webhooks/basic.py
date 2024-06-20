@@ -18,11 +18,13 @@ class BasicHookArguments(NamedTuple):
     url: str
     save_location: Union[Path, str]
 
+
 class BasicHookArgumentsRaw(TypedDict):
     """BasicHookContent is the content for BasicHook."""
 
     url: str
     save_location: Union[Path, str]
+
 
 class BasicHook:
     """BasicHook is the basic webhook for CapSule.
