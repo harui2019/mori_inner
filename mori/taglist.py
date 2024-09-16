@@ -10,14 +10,13 @@ from typing import (
     Literal,
     Union,
     TypeVar,
-    Hashable,
     NamedTuple,
-    Iterable,
     Any,
     overload,
 )
-from pathlib import Path
 from collections import defaultdict
+from collections.abc import Hashable, Iterable
+from pathlib import Path
 import os
 import json
 import csv
@@ -28,7 +27,7 @@ from .utils import defaultOpenArgs, defaultPrintArgs, defaultJsonDumpArgs
 from ..jsonablize import parse
 from ..exception import TagListTakeNotIterableWarning
 
-_K = TypeVar("_K")
+_K = TypeVar("_K", bound=Hashable)
 _V = TypeVar("_V")
 _T = TypeVar("_T")
 
@@ -69,13 +68,9 @@ def tuple_str_parse(k: str) -> Union[tuple[str, ...], str]:
 @overload
 def key_tuple_loads(
     o: dict[Union[Hashable, _K], _T]
-) -> dict[Union[Hashable, tuple[Hashable, ...], _K], _T]:
-    ...
-
-
+) -> dict[Union[Hashable, tuple[Hashable, ...], _K], _T]: ...
 @overload
-def key_tuple_loads(o: _T) -> _T:
-    ...
+def key_tuple_loads(o: _T) -> _T: ...
 
 
 def key_tuple_loads(o):
@@ -103,7 +98,7 @@ def key_tuple_loads(o):
     return o
 
 
-class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
+class TagList(defaultdict[_K, list[Union[_V, Any]]]):
     """Specific data structures of :module:`qurry` like `dict[str, list[any]]`.
 
     >>> bla = TagList()
@@ -133,22 +128,21 @@ class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
 
     def __init__(
         self,
-        o: Optional[dict[Union[_K, Hashable], list[_V]]] = None,
+        o: Optional[dict[_K, Iterable[Any]]] = None,
         name: str = __name__,
         tuple_str_auto_transplie: bool = True,
     ) -> None:
-        if o is None:
-            o = {}
-        if not isinstance(o, dict):
+        pass_o = {} if o is None else o
+        if not isinstance(pass_o, dict):
             raise ValueError("Input needs to be a dict with all values are iterable.")
         super().__init__(list)
         self.__name__ = name
 
-        o = key_tuple_loads(o) if tuple_str_auto_transplie else o
+        pass_o = key_tuple_loads(pass_o) if tuple_str_auto_transplie else pass_o
         not_list_v = []
-        for k, v in o.items():
+        for k, v in pass_o.items():
             if isinstance(v, Iterable):
-                self[k] = list(v)
+                self[k].extend(v)  # type: ignore
             else:
                 not_list_v.append(k)
 
@@ -173,8 +167,8 @@ class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
 
     def guider(
         self,
-        legacy_tag: Optional[Hashable] = None,
-        v: any = None,
+        legacy_tag: Optional[_K] = None,
+        v: Any = None,
     ) -> None:
         """
 
@@ -190,7 +184,7 @@ class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
                 warnings.warn(f"'{k}' is a reserved key for export data.")
 
         if legacy_tag is None:
-            self[()].append(v)
+            self[()].append(v)  # type: ignore
         elif legacy_tag in self:
             self[legacy_tag].append(v)
         else:
@@ -264,7 +258,9 @@ class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
         if json_dump_args is None:
             json_dump_args = defaultJsonDumpArgs.copy()
         else:
-            json_dump_args = {k: v for k, v in json_dump_args.items() if k != "obj" or k != "fp"}
+            json_dump_args = {
+                k: v for k, v in json_dump_args.items() if k != "obj" or k != "fp"
+            }
             json_dump_args = {**defaultJsonDumpArgs.copy(), **json_dump_args}
 
         # save_location
@@ -278,7 +274,9 @@ class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
 
         # file type check
         if filetype not in cls.availableFile:
-            raise ValueError(f"Instead of '{filetype}', Only {cls.availableFile} can be exported.")
+            raise ValueError(
+                f"Instead of '{filetype}', Only {cls.availableFile} can be exported."
+            )
 
         # return {
         #     "open_args": open_args,
@@ -500,7 +498,7 @@ class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
             with open(
                 args.save_location / filename, encoding=encoding, **args.open_args
             ) as read_json:
-                raw_data: dict[Hashable, list[str]] = json.load(read_json)
+                raw_data = json.load(read_json)
                 obj = cls(
                     o=raw_data,
                     name=taglist_name,
@@ -516,10 +514,12 @@ class TagList(defaultdict[Union[_K, Hashable], list[_V]]):
                 newline="",
             ) as read_csv:
                 taglist_reaper = csv.reader(read_csv, quotechar="|")
-                obj: cls[str, str] = cls(name=taglist_name)  # cls is also a type alias
+                obj = cls(name=taglist_name)
                 for k, v in taglist_reaper:
                     kt = tuple_str_parse(k) if tuple_str_auto_transplie else k
-                    obj[kt].append(v)
+                    obj[kt].append(v)  # type: ignore
             return obj
 
-        raise ValueError(f"Instead of '{filetype}', Only {cls.availableFile} can be exported.")
+        raise ValueError(
+            f"Instead of '{filetype}', Only {cls.availableFile} can be exported."
+        )
