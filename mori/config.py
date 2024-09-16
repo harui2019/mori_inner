@@ -41,7 +41,7 @@ class DefaultConfig:
                 self.__annotations__[k] = default_type[k]
                 self.default[k] = None
             else:
-                self.__annotations__[k] = Any
+                self.__annotations__[k] = Type[Any]
             self.default[k] = default[k]
 
         self.namedtuple = namedtuple(
