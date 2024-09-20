@@ -1,5 +1,4 @@
 """
-
 ================================================================
 Utilities for :mod:`qurry.capsule.mori` --- *Mori* CapSule Utils
 (:mod:`qurry.capsule.mori.utils`)
