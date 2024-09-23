@@ -101,9 +101,7 @@ class GitSyncControl(list[str]):
         if not os.path.exists(save_location):
             raise FileNotFoundError("The save_location is not found.")
 
-        with open(
-            save_location / ".gitignore", encoding=encoding, **open_args
-        ) as ignore_list:
+        with open(save_location / ".gitignore", encoding=encoding, **open_args) as ignore_list:
             for item in self:
                 print(item, file=ignore_list, **print_args)
 
@@ -147,9 +145,7 @@ class GitSyncControl(list[str]):
             raise TypeError("The save_location is not the type of 'str' or 'Path'.")
 
         if os.path.exists(save_location / ".gitignore"):
-            with open(
-                save_location / ".gitignore", encoding=encoding, **open_args
-            ) as ignore_list:
+            with open(save_location / ".gitignore", encoding=encoding, **open_args) as ignore_list:
                 for line in ignore_list.readlines():
                     new_line = line.strip()
                     if new_line not in self:

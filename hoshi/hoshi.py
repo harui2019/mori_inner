@@ -160,8 +160,7 @@ def itemize(
     description: str,
     *,
     export_len: Literal[True],
-) -> tuple[str, int, int]:
-    ...
+) -> tuple[str, int, int]: ...
 
 
 @overload
@@ -169,8 +168,7 @@ def itemize(
     description: str,
     *,
     independent_newline: Literal[True],
-) -> Union[tuple[str, str], str]:
-    ...
+) -> Union[tuple[str, str], str]: ...
 
 
 @overload
@@ -179,8 +177,7 @@ def itemize(
     *,
     export_len: bool,
     independent_newline: bool,
-) -> str:
-    ...
+) -> str: ...
 
 
 def itemize(
