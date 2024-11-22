@@ -20,7 +20,6 @@ from pathlib import Path
 import os
 import json
 import csv
-import glob
 import warnings
 
 from .utils import defaultOpenArgs, defaultPrintArgs, defaultJsonDumpArgs
@@ -258,7 +257,9 @@ class TagList(defaultdict[_K, list[Union[_V, Any]]]):
         if json_dump_args is None:
             json_dump_args = defaultJsonDumpArgs.copy()
         else:
-            json_dump_args = {k: v for k, v in json_dump_args.items() if k != "obj" or k != "fp"}
+            json_dump_args = {
+                k: v for k, v in json_dump_args.items() if k != "obj" or k != "fp"
+            }
             json_dump_args = {**defaultJsonDumpArgs.copy(), **json_dump_args}
 
         # save_location
@@ -272,7 +273,9 @@ class TagList(defaultdict[_K, list[Union[_V, Any]]]):
 
         # file type check
         if filetype not in cls.availableFile:
-            raise ValueError(f"Instead of '{filetype}', Only {cls.availableFile} can be exported.")
+            raise ValueError(
+                f"Instead of '{filetype}', Only {cls.availableFile} can be exported."
+            )
 
         # return {
         #     "open_args": open_args,
@@ -289,10 +292,10 @@ class TagList(defaultdict[_K, list[Union[_V, Any]]]):
 
     def export(
         self,
+        name: str,
         save_location: Union[Path, str] = Path("./"),
-        taglist_name: str = __name__,
-        name: Optional[str] = None,
         filetype: AvailableFileType = "json",
+        taglist_name: str = __name__,
         open_args: Optional[dict[str, Any]] = None,
         print_args: Optional[dict[str, Any]] = None,
         json_dump_args: Optional[dict[str, Any]] = None,
@@ -300,19 +303,18 @@ class TagList(defaultdict[_K, list[Union[_V, Any]]]):
         """Export `tagList`.
 
         Args:
-            save_location (Path): The location of file.
-            taglist_name (str, optional):
-                Name for this `tagList`.
-                Defaults to :attr:`self.__name__`.
             name (Optional[str], optional):
-                Addition name for this `tagList`,
-                when does not specify any text but `None`, then generating file name like:
-                >>> f"{name}.{filetype}"
-                Otherwise, :
-                >>> f"{additionName}.{name}.{filetype}"
-                Defaults to None.
+                File name for this `tagList`.
+                The file name will be: `f"{name}.{taglist_name}.{filetype}"`.
+                For example, if `name` is `example`, `taglist_name` is `tagList`,
+                and `filetype` is `json`, the file name will be `example.tagList.json`.
+            save_location (Path): The location of file.
             filetype (Literal[&#39;json&#39;, &#39;csv&#39;], optional):
                 Export type of `tagList`. Defaults to 'json'.
+            taglist_name (str, optional):
+                The suffix name for this `tagList`.
+                Defaults to `__name__`.
+                The file name will be: `f"{name}.{taglist_name}.{filetype}"`.
             open_args (dict[str, Any], optional):
                 The other arguments for :func:`open` function.
                 Defaults to :attr:`self.defaultOpenArgs`, which is:
@@ -349,7 +351,7 @@ class TagList(defaultdict[_K, list[Union[_V, Any]]]):
         encoding = args.open_args.pop("encoding")
         assert isinstance(encoding, str), "encoding must be str"
 
-        filename = ("" if name is None else f"{name}.") + f"{taglist_name}.{filetype}"
+        filename = f"{name}.{taglist_name}.{filetype}"
 
         if filetype == "json":
             with open(
@@ -377,33 +379,37 @@ class TagList(defaultdict[_K, list[Union[_V, Any]]]):
     @classmethod
     def read(
         cls,
+        filename: str,
         save_location: Union[Path, str] = Path("./"),
-        taglist_name: str = __name__,
-        name: Optional[str] = None,
         filetype: AvailableFileType = "json",
+        taglist_name: str = __name__,
         tuple_str_auto_transplie: bool = True,
         open_args: Optional[dict[str, Any]] = None,
         print_args: Optional[dict[str, Any]] = None,
         json_dump_args: Optional[dict[str, Any]] = None,
-        which_num: int = 0,
-        raise_not_found_error: bool = True,
     ) -> "TagList":
         """Export `tagList`.
 
         Args:
             save_location (Path): The location of file.
-            taglist_name (str, optional):
-                Name for this `tagList`.
-                Defaults to `tagList`.
-            name (Optional[str], optional):
-                Addition name for this `tagList`,
-                when does not specify any text but `None`, then generating file name like:
-                >>> f"{name}.{filetype}"
-                Otherwise, :
-                >>> f"{additionName}.{name}.{filetype}"
-                Defaults to None.
+            filename (Optional[str], optional):
+                File name for this `tagList` with suffix name of `tagList`.
+                The file name should be something like:
+                    `f"{name}.{taglist_name}.{filetype}"`.
+                For example, if `name` is `example`, `taglist_name` is `tagList`,
+                and `filetype` is `json`, the file name will be `example.tagList.json`.
+                You need put the `name` and `taglist_name` in the filename like:
+                >>> filename="example.tagList"
+                `tagList` is the suffix name of this `tagList`.
+                >>> taglist_name="tagList"
+                `filetype` is the file type of the file.
+                >>> filetype="json"
             filetype (Literal[&#39;json&#39;, &#39;csv&#39;], optional):
                 Export type of `tagList`. Defaults to 'json'.
+            taglist_name (str, optional):
+                The suffix name for this `tagList`.
+                Defaults to `__name__`.
+                The file name will be: `f"{name}.{taglist_name}.{filetype}"`.
             tuple_str_auto_transplie (bool, optional):
                 Whether to transplie tuple string to tuple.
             open_args (Optional[dict[str, Any]], optional):
@@ -423,13 +429,6 @@ class TagList(defaultdict[_K, list[Union[_V, Any]]]):
                 >>> {
                     'indent': 2,
                 }
-            which_num (int, optional):
-                When there are multiple files with the same name,
-                which one to choose.
-                Defaults to 0.
-            raise_not_found_error (bool, optional):
-                Whether to raise error when not found.
-                Defaults to True.
 
         Raises:
             FileNotFoundError: When file not found.
@@ -450,45 +449,10 @@ class TagList(defaultdict[_K, list[Union[_V, Any]]]):
         encoding = args.open_args.pop("encoding")
         assert isinstance(encoding, str), "encoding must be str"
 
-        ls_loc11 = glob.glob(str(args.save_location / f"{taglist_name}.*"))
-        ls_loc12 = glob.glob(str(args.save_location / f"*.{taglist_name}.*"))
-        if len(ls_loc11) == 0 and len(ls_loc12) == 0:
-            ls_loc1 = []
-        elif len(ls_loc11) == 0:
-            ls_loc1 = ls_loc12
-        elif len(ls_loc12) == 0:
-            ls_loc1 = ls_loc11
-        else:
-            ls_loc1 = ls_loc11 + ls_loc12
-
-        if len(ls_loc1) == 0:
-            if raise_not_found_error:
-                raise FileNotFoundError(
-                    f"The file '*.{taglist_name}.*' not found at '{save_location}'."
-                )
-            return cls(name=taglist_name)
-        ls_loc2 = [f for f in ls_loc1 if filetype in f]
-        if name is not None:
-            ls_loc2 = [f for f in ls_loc2 if name in f]
-
-        if len(ls_loc2) < 1:
-            if raise_not_found_error:
-                raise FileNotFoundError(
-                    "The file "
-                    + ("" if name is None else f"{name}.")
-                    + f"{taglist_name}.{filetype}"
-                    + f" not found at '{save_location}'."
-                )
-            return cls(name=taglist_name)
-        if len(ls_loc2) > 1:
-            ls_loc2 = [ls_loc2[which_num]]
-            print(
-                f"The following files '{ls_loc2}' are fitting giving 'taglist_name' and 'name', "
-                + f"choosing the '{ls_loc2[0]}'."
-            )
-
-        filename = ls_loc2[0]
-        filename = Path(filename).name
+        assert taglist_name in filename, (
+            f"taglist_name: '{taglist_name}' must be a part of filename: '{filename}', "
+            + f"like 'example.{taglist_name}.{filetype}'."
+        )
 
         if filetype == "json":
             with open(
@@ -516,4 +480,6 @@ class TagList(defaultdict[_K, list[Union[_V, Any]]]):
                     obj[kt].append(v)  # type: ignore
             return obj
 
-        raise ValueError(f"Instead of '{filetype}', Only {cls.availableFile} can be exported.")
+        raise ValueError(
+            f"Instead of '{filetype}', Only {cls.availableFile} can be exported."
+        )
